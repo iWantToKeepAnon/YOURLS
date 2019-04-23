@@ -4,6 +4,10 @@
   </a>
 </h1>
 
+> Postgres Fork
+
+I forked yourls b/c it does not support Postgres (master project is mysql only). I have not gone to the effort to isolate the differences (there are not many) to make the selection process easier. If this is valuable then I may consider it or maybe the original author would be interested in finishing that.
+
 > Your Own URL Shortener
 
 [![Build Status](https://api.travis-ci.org/YOURLS/YOURLS.svg?branch=master)](https://travis-ci.org/YOURLS/YOURLS) [![Packagist](https://img.shields.io/packagist/v/yourls/yourls.svg)](https://packagist.org/packages/yourls/yourls) [![OpenCollective](https://opencollective.com/yourls/backers/badge.svg)](https://opencollective.com/yourls#contributors) 
