@@ -208,55 +208,64 @@ function yourls_create_sql_tables() {
 	// Create Table Query
 	$create_tables = array();
 	$create_tables[YOURLS_DB_TABLE_URL] =
-		'CREATE TABLE IF NOT EXISTS `'.YOURLS_DB_TABLE_URL.'` ('.
-		'`keyword` varchar(200) BINARY NOT NULL,'.
-		'`url` text BINARY NOT NULL,'.
-		'`title` text CHARACTER SET utf8,'.
-		'`timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,'.
-		'`ip` VARCHAR(41) NOT NULL,'.
-		'`clicks` INT(10) UNSIGNED NOT NULL,'.
-		' PRIMARY KEY  (`keyword`),'.
-		' KEY `timestamp` (`timestamp`),'.
-		' KEY `ip` (`ip`)'.
+		'CREATE TABLE IF NOT EXISTS '.YOURLS_DB_TABLE_URL.' ('.
+		'	keyword varchar(200) NOT NULL PRIMARY KEY,'.
+		'	url text NOT NULL,'.
+		'	title text,'.
+		'	timestamp timestamp NOT NULL DEFAULT NOW(),'.
+		'	ip varchar(41) NOT NULL,'.
+		'	clicks int NOT NULL'.
 		');';
+		$create_tables['ndx1_' . YOURLS_DB_TABLE_URL.'_timestamp'] = 'CREATE INDEX '.YOURLS_DB_TABLE_URL.'_timestamp ON '.YOURLS_DB_TABLE_URL.'(timestamp);';
+		$create_tables['ndx2_' . YOURLS_DB_TABLE_URL.'_ip'] = 'CREATE INDEX '.YOURLS_DB_TABLE_URL.'_ip ON '.YOURLS_DB_TABLE_URL.'(ip);';
 
 	$create_tables[YOURLS_DB_TABLE_OPTIONS] =
-		'CREATE TABLE IF NOT EXISTS `'.YOURLS_DB_TABLE_OPTIONS.'` ('.
-		'`option_id` bigint(20) unsigned NOT NULL auto_increment,'.
-		'`option_name` varchar(64) NOT NULL default "",'.
-		'`option_value` longtext NOT NULL,'.
-		'PRIMARY KEY  (`option_id`,`option_name`),'.
-		'KEY `option_name` (`option_name`)'.
-		') AUTO_INCREMENT=1 ;';
+		'CREATE TABLE IF NOT EXISTS '.YOURLS_DB_TABLE_OPTIONS.' ('.
+		'	option_id bigserial NOT NULL,'.
+		'	option_name varchar(64) NOT NULL DEFAULT \'\','.
+		'	option_value text NOT NULL,'.
+		'	PRIMARY KEY(option_id, option_name),'.
+		'	UNIQUE(option_name)'.
+		');';
+	//NOTE: I put 'option_name' as a unique index; that breaks from default simple index. Should be ok for base yourls code, would/should anyone overload an option name?
 
 	$create_tables[YOURLS_DB_TABLE_LOG] =
-		'CREATE TABLE IF NOT EXISTS `'.YOURLS_DB_TABLE_LOG.'` ('.
-		'`click_id` int(11) NOT NULL auto_increment,'.
-		'`click_time` datetime NOT NULL,'.
-		'`shorturl` varchar(200) BINARY NOT NULL,'.
-		'`referrer` varchar(200) NOT NULL,'.
-		'`user_agent` varchar(255) NOT NULL,'.
-		'`ip_address` varchar(41) NOT NULL,'.
-		'`country_code` char(2) NOT NULL,'.
-		'PRIMARY KEY  (`click_id`),'.
-		'KEY `shorturl` (`shorturl`)'.
-		') AUTO_INCREMENT=1 ;';
+		'CREATE TABLE IF NOT EXISTS '.YOURLS_DB_TABLE_LOG.' ('.
+		'	click_id serial NOT NULL PRIMARY KEY,'.
+		'	click_time timestamp WITHOUT TIME ZONE NOT NULL,'.
+		'	shorturl varchar(200) NOT NULL,'.
+		'	referrer varchar(200) NOT NULL,'.
+		'	user_agent varchar(255) NOT NULL,'.
+		'	ip_address varchar(41) NOT NULL,'.
+		'	country_code char(2) NOT NULL'.
+		');';
+		$create_tables['ndx1_' . YOURLS_DB_TABLE_LOG.'_shorturl'] = 'CREATE INDEX '.YOURLS_DB_TABLE_LOG.'_shorturl ON '.YOURLS_DB_TABLE_LOG.'(shorturl);';
 
 
-	$create_table_count = 0;
+	$create_obj_count = 0;
 
     yourls_debug_mode(true);
 
 	// Create tables
 	foreach ( $create_tables as $table_name => $table_query ) {
 		$ydb->perform( $table_query );
-		$create_success = $ydb->fetchAffected( "SHOW TABLES LIKE '$table_name'" );
-		if( $create_success ) {
-			$create_table_count++;
-			$success_msg[] = yourls_s( "Table '%s' created.", $table_name );
-		} else {
-			$error_msg[] = yourls_s( "Error creating table '%s'.", $table_name );
+
+		if (0 === strncmp($table_name, 'ndx', 3)) {
+			$obj_type = 'index';
+			$create_success = $ydb->fetchAffected( "SELECT indexrelname FROM pg_stat_all_indexes WHERE schemaname = 'public' and indexrelname = '" . substr($table_name, 5) . "'" );
 		}
+		else {
+			$obj_type = 'table';
+			$create_success = $ydb->fetchAffected( "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '$table_name' AND table_catalog = '" . YOURLS_DB_NAME . "' AND table_schema = 'public' AND table_type = 'BASE TABLE'" );
+		}
+
+		if( $create_success ) {
+			$create_obj_count++;
+			$success_msg[] = yourls_s( "$obj_type '%s' created.", $table_name );
+		} else {
+			$error_msg[] = yourls_s( "Error creating $obj_type '%s'.", $table_name );
+		}
+
 	}
 
 	// Initializes the option table
@@ -268,7 +277,7 @@ function yourls_create_sql_tables() {
 		$error_msg[] = yourls__( 'Could not insert sample short URLs' );
 
 	// Check results of operations
-	if ( sizeof( $create_tables ) == $create_table_count ) {
+	if ( sizeof( $create_tables ) == $create_obj_count ) {
 		$success_msg[] = yourls__( 'YOURLS tables successfully created.' );
 	} else {
 		$error_msg[] = yourls__( 'Error creating YOURLS tables.' );

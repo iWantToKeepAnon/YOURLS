@@ -51,7 +51,7 @@ class Options {
 
             // We could not fetch value from the table. Let's check if the option table exists
             try {
-                $check = $this->ydb->fetchAffected(sprintf("SHOW TABLES LIKE '%s'", $table));
+                $check = $this->ydb->fetchAffected("SELECT table_name FROM information_schema.tables WHERE table_name LIKE '$table_name' AND table_catalog = '" . YOURLS_DB_NAME . "' AND table_schema = 'public' AND table_type = 'BASE TABLE'");
                 // Table doesn't exist
                 if ($check ==0) {
                     return false;

@@ -145,7 +145,7 @@ class Init {
         if (file_exists(YOURLS_USERDIR.'/db.php')) {
             require_once YOURLS_USERDIR.'/db.php';
         } else {
-            require_once YOURLS_INC.'/class-mysql.php';
+            require_once YOURLS_INC.'/class-pgsql.php';
             yourls_db_connect();
         }
     }
