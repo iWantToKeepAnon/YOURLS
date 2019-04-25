@@ -208,7 +208,7 @@ function yourls_create_sql_tables() {
 	// Create Table Query
 	$create_tables = array();
 	$create_tables[YOURLS_DB_TABLE_URL] =
-		'CREATE TABLE IF NOT EXISTS '.YOURLS_DB_TABLE_URL.' ('.
+		'CREATE TABLE '.YOURLS_DB_TABLE_URL.' ('.
 		'	keyword varchar(200) NOT NULL PRIMARY KEY,'.
 		'	url text NOT NULL,'.
 		'	title text,'.
@@ -220,7 +220,7 @@ function yourls_create_sql_tables() {
 		$create_tables['ndx2_' . YOURLS_DB_TABLE_URL.'_ip'] = 'CREATE INDEX '.YOURLS_DB_TABLE_URL.'_ip ON '.YOURLS_DB_TABLE_URL.'(ip);';
 
 	$create_tables[YOURLS_DB_TABLE_OPTIONS] =
-		'CREATE TABLE IF NOT EXISTS '.YOURLS_DB_TABLE_OPTIONS.' ('.
+		'CREATE TABLE '.YOURLS_DB_TABLE_OPTIONS.' ('.
 		'	option_id bigserial NOT NULL,'.
 		'	option_name varchar(64) NOT NULL DEFAULT \'\','.
 		'	option_value text NOT NULL,'.
@@ -230,7 +230,7 @@ function yourls_create_sql_tables() {
 	//NOTE: I put 'option_name' as a unique index; that breaks from default simple index. Should be ok for base yourls code, would/should anyone overload an option name?
 
 	$create_tables[YOURLS_DB_TABLE_LOG] =
-		'CREATE TABLE IF NOT EXISTS '.YOURLS_DB_TABLE_LOG.' ('.
+		'CREATE TABLE '.YOURLS_DB_TABLE_LOG.' ('.
 		'	click_id serial NOT NULL PRIMARY KEY,'.
 		'	click_time timestamp WITHOUT TIME ZONE NOT NULL,'.
 		'	shorturl varchar(200) NOT NULL,'.
