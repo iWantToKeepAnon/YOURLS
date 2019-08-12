@@ -6,7 +6,7 @@
 
 > Postgres Fork
 
-I forked yourls b/c it does not support Postgres (master project is mysql only). I have not gone to the effort to isolate the differences (there are not many) to make the selection process easier. If this is valuable then I may consider it or maybe the original author would be interested in finishing that.
+I forked yourls b/c it does not support Postgres (master project is mysql only). I have not gone to the effort to isolate the differences (there are not many) to make the selection process easier. If this is valuable then I may consider it or maybe the original author would be interested in finishing that (it has been oft requested).
 
 > Your Own URL Shortener
 
